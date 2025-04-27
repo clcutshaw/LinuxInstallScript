@@ -32,7 +32,7 @@ sudo nala install klavaro -y
 sudo nala install snapd -y
 sudo snap install discord
 sudo snap install bitwarden
-sudo snap install todoist sudo
+sudo snap install todoist
 sudo snap install steam
 sudo snap install okular
 sudo snap install notepad-plus-plus
