@@ -25,15 +25,16 @@ sudo apt autoremove --purge kfind -y
 case $ID in
   debian) # Matches "debian"
     echo "This machine is running Debian";
-    debianinstall; 
+    debianinstall;
+    sleep 10
     ;; 
   kali) # Matches "arch"
     echo "This machine is running Kali Linux";
-    sleep 5;	
+    sleep 10;	
     ;;
   zorin) # Matches "zorin"
     echo "This machine is running Zorin";
-    sleep 5;
+    sleep 10;
     ;;	 
   *) # This is the default case
     echo "This machine is running $ID";
