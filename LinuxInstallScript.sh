@@ -74,4 +74,4 @@ echo "Installation complete, device will now restart."
 echo "Installation complete. Media will now self delete. Have a good day."
 rm -- $0
 #sleep 10
-#sudo shutdown -r now
+sudo shutdown -r now
