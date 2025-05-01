@@ -7,8 +7,7 @@ echo "Welcome User. Beginning installation of your Linux Configuration"
 sudo apt update
 sudo apt upgrade -y
 
-# This populates the OS Identification Data
-source /etc/os-release
+source /etc/os-release #This populates the OS Identification Data
 
 debianinstall () { #Function for KDE install on Debian
 sudo apt install xorg -y
@@ -25,19 +24,19 @@ case $ID in
   debian) # Matches "debian"
     echo "This machine is running Debian";
     debianinstall;
-    sleep 10
+    sleep 5;
     ;; 
-  kali) # Matches "arch"
+  kali) # Matches "kali"
     echo "This machine is running Kali Linux";
-    sleep 10;	
+    sleep 5;	
     ;;
   zorin) # Matches "zorin"
     echo "This machine is running Zorin";
-    sleep 10;
+    sleep 5;
     ;;	 
   *) # This is the default case
     echo "This machine is running $ID";
-    sleep 10 
+    sleep 5; 
     ;;
 esac # ends case statement
 
@@ -69,12 +68,10 @@ sudo snap install notepad-plus-plus
 sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
 
-echo "Installation complete, device will now restart."
 #echo “Preparing cryptographic signatures for advance setup. Proceed?”
+
 echo "Installation complete. Media will now self delete. Have a good day."
-#sleep 10
+
 sudo shutdown -r +1
-sleep 10
+sleep 8
 rm -- $0
-
-
