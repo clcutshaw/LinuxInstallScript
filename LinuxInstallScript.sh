@@ -73,7 +73,8 @@ echo "Installation complete, device will now restart."
 #echo “Preparing cryptographic signatures for advance setup. Proceed?”
 echo "Installation complete. Media will now self delete. Have a good day."
 #sleep 10
-sudo shutdown -r
+sudo shutdown -r +1
+sleep 10
 rm -- $0
 
 
