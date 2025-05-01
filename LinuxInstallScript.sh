@@ -71,6 +71,7 @@ sudo snap install audible-for-linux
 
 echo "Installation complete, device will now restart."
 #echo “Preparing cryptographic signatures for advance setup. Proceed?”
-#echo "Installation complete. Media will now self delete. Have a good day."
+echo "Installation complete. Media will now self delete. Have a good day."
+rm -- $0
 #sleep 10
-sudo shutdown -r now
+#sudo shutdown -r now
