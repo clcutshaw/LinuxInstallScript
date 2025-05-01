@@ -19,7 +19,6 @@ sudo apt install kde-plasma-desktop -y
 sudo apt autoremove --purge konqueror -y
 sudo apt autoremove --purge kate -y
 sudo apt autoremove --purge kwalletmanager -y 
-sudo apt autoremove --purge kfind -y
 }
 
 case $ID in
