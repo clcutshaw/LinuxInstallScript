@@ -1,11 +1,14 @@
-#!/bin/bash
+while true; do
 
-read -p "continue test? (y/n)" yn
+read -p Do you wish to proceed? yn
 
-case $yn in
-	[yY] ) echo Ok, proceeding;;
-	[nN] ) echo Exiting;
-		exit;;
-	* ) echo Invalid response;
-		exit 1;;
+case "$yn" in
+  [yY]) echo "Proceeding";
+  break;;
+  [nN]) echo "Understood, Exiting";
+  rm -- $0
+  exit;;
+  *) echo "Invalid Response";;
 esac
+
+done
