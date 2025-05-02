@@ -15,6 +15,8 @@ case "$yn" in
   exit;;
   *) echo "Invalid Response";;
 esac
+
+done
   
 sudo apt update
 sudo apt upgrade -y
