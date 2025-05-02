@@ -14,7 +14,7 @@ case "$yn" in
   rm -- $0
   exit;;
   *) echo "Invalid Response";;
-ecas
+esac
   
 sudo apt update
 sudo apt upgrade -y
