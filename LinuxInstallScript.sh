@@ -2,8 +2,19 @@
 
 #To be run after adding machine local user to sudo group
 echo "Welcome User. Beginning installation of your Linux Configuration"
-#echo “Do you wish to proceed?”
 
+while true; do
+
+read -p “Do you wish to proceed?” yn
+
+case "yn" in
+  [yY]) echo "Proceeding";
+  break;;
+  [nN]) echo "Understood, Exiting";
+  exit;;
+  *) echo "Invalid Response";;
+ecas
+  
 sudo apt update
 sudo apt upgrade -y
 
