@@ -71,12 +71,14 @@ sudo nala install handbrake -y
 sudo nala install flameshot -y
 sudo nala install barrier -y
 sudo nala install klavaro -y
+sudo nala install mirage -y
 sudo nala install snapd -y
 sudo snap install discord
 sudo snap install bitwarden
 sudo snap install todoist
 sudo snap install steam
 sudo snap install okular
+sudo snap install cura-slicer
 sudo snap install notepad-plus-plus
 sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
