@@ -5,17 +5,19 @@ echo "Welcome User. Beginning installation of your Linux Configuration"
 
 while true; do
 
-read -p "continue test? (y/n)" yn
+read -p "Do you want to proceed? (yes/no) " yn
 
-case $yn in
-	[yY] ) echo Ok, proceeding;
+case $yn in 
+	yes ) echo ok, we will proceed;
 		break;;
-	[nN] ) echo Exiting;
+	no ) echo exiting...;
 		exit;;
-	* ) echo Invalid response;;
+	* ) echo invalid response;;
 esac
 
 done
+
+echo doing stuff...
 
 sudo apt update
 sudo apt upgrade -y
