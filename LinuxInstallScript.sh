@@ -5,7 +5,7 @@ echo "Welcome User. Beginning installation of your Linux Configuration"
 
 while true; do
 
-read -p “Do you wish to proceed?” yn
+read -p Do you wish to proceed? yn
 
 case "$yn" in
   [yY]) echo "Proceeding";
