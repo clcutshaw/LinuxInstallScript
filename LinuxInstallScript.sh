@@ -3,6 +3,7 @@
 #To be run after adding machine local user to sudo group
 echo "Welcome User. Beginning installation of your Linux Configuration"
 
+interaciveyn() { #Function for y/n uder interact
 while true; do
 
 read -p "Do you want to proceed?" yn
@@ -10,12 +11,17 @@ read -p "Do you want to proceed?" yn
 case $yn in 
 	[yY]) echo ok, we will proceed;
 		break;;
-	[nN]) echo exiting...;
-		exit;;
+	[nN]) echo Installation cancelled. Media will self delete, computer will restart.;
+		sudo shutdown -r +1
+		sleep 8
+		rm -- $0;;
 	* ) echo invalid response;;
 esac
 
 done
+}
+
+interactiveyn
 
 sudo apt update
 sudo apt upgrade -y
@@ -85,6 +91,7 @@ sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
 
 #echo “Preparing cryptographic signatures for advance setup. Proceed?”
+#interactiveyn
 
 echo "Installation complete. Media will now self delete. Have a good day."
 
