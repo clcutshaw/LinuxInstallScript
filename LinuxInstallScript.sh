@@ -12,8 +12,8 @@ case $yn in
 	[yY]) echo ok, we will proceed;
 		break;;
 	[nN]) echo Installation cancelled. Media will self delete, computer will restart.;
-		sudo shutdown -r +1
-		sleep 8
+		sudo shutdown -r +1;
+		sleep 8;
 		rm -- $0;;
 	* ) echo invalid response;;
 esac
