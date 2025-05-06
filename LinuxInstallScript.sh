@@ -95,6 +95,8 @@ echo “Preparing cryptographic signatures for advance setup. Proceed?”
 
 interactiveyn
 
+sudo apt-get autoclean
+
 echo "Installation complete. Media will now self delete. Have a good day."
 
 sudo shutdown -r +1
