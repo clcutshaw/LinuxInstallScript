@@ -3,7 +3,7 @@
 #To be run after adding machine local user to sudo group
 echo "Welcome User. Beginning installation of your Linux Configuration"
 
-interaciveyn() { #Function for y/n userr interact
+interactiveyn() { #Function for y/n userr interact
 while true; do
 
 read -p "Do you want to proceed?" yn
@@ -21,7 +21,7 @@ esac
 done
 }
 
-interaciveyn
+interactiveyn
 
 sudo apt update
 sudo apt upgrade -y
