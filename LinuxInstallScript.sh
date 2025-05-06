@@ -35,6 +35,7 @@ sudo systemctl enable sddm
 sudo systemctl set-default graphical.target
 sudo apt install kde-plasma-desktop -y
 sudo apt autoremove --purge konqueror -y
+wait
 sudo apt autoremove --purge kate -y
 sudo apt autoremove --purge kwalletmanager -y 
 }
