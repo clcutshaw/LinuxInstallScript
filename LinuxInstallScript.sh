@@ -3,7 +3,20 @@
 #To be run after adding machine local user to sudo group
 echo "Welcome User. Beginning installation of your Linux Configuration"
 
-interactiveyn() { #Function for y/n userr interact
+#Functions for automated install 
+
+debianinstall () { #Function for KDE install on Debian
+sudo apt install xorg -y
+sudo apt install sddm -y
+sudo systemctl enable sddm
+sudo systemctl set-default graphical.target
+sudo apt install kde-plasma-desktop -y
+sudo apt autoremove --purge konqueror -y
+sudo apt autoremove --purge kate -y
+sudo apt autoremove --purge kwalletmanager -y 
+}
+
+interactiveyn() { #Function for y/n user interact
 while true; do
 
 read -p "Do you want to proceed?" yn
@@ -27,18 +40,6 @@ sudo apt update
 sudo apt upgrade -y
 
 source /etc/os-release #This populates the OS Identification Data
-
-debianinstall () { #Function for KDE install on Debian
-sudo apt install xorg -y
-sudo apt install sddm -y
-sudo systemctl enable sddm
-sudo systemctl set-default graphical.target
-sudo apt install kde-plasma-desktop -y
-sudo apt autoremove --purge konqueror -y
-wait
-sudo apt autoremove --purge kate -y
-sudo apt autoremove --purge kwalletmanager -y 
-}
 
 case $ID in
   debian) # Matches "debian"
@@ -95,7 +96,7 @@ sudo snap install audible-for-linux
 
 #interactiveyn
 
-sudo apt-get autoclean
+sudo apt autoclean
 
 echo "Installation complete. Media will now self delete. Have a good day."
 
