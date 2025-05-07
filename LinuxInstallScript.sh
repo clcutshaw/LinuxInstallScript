@@ -39,6 +39,8 @@ interactiveyn
 sudo apt update
 sudo apt upgrade -y
 
+#Determine OS to select install path 
+
 source /etc/os-release #This populates the OS Identification Data
 
 case $ID in
