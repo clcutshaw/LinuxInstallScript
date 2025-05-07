@@ -91,9 +91,9 @@ sudo snap install notepad-plus-plus
 sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
 
-echo “Preparing cryptographic signatures for advance setup. Proceed?”
+#echo “Preparing cryptographic signatures for advance setup. Proceed?”
 
-interactiveyn
+#interactiveyn
 
 sudo apt-get autoclean
 
