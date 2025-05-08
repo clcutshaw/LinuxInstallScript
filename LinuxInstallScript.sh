@@ -63,6 +63,11 @@ case $ID in
     ;;
 esac # ends case statement
 
+sudo tee /etc/apt/sources.list.d/testlist.list <<EOL 
+deb https://deb/debian.org/debian bookworm contrib non-free non-free-firmware
+EOL 
+#Adds non-free and non-free-firmware components
+
 sudo apt update
 sudo apt upgrade -y
 sudo apt install nala -y
