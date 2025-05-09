@@ -19,7 +19,7 @@ sudo apt autoremove --purge kwalletmanager -y
 interactiveyn() { #Function for y/n user interact
 while true; do
 
-read -pr "Do you want to proceed? [Y/N]" yn
+read -p "Do you want to proceed? [Y/N]" yn
 
 case $yn in 
 	[yY]) echo ok, we will proceed;
