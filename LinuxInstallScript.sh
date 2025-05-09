@@ -77,6 +77,7 @@ EOL
  	;;
   *) #No Match
    	echo "This Machine does not use a Broadcom WiFi Driver";
+    	sleep 30;
     	unset BroadcomWifi;
         ;;
 esac
