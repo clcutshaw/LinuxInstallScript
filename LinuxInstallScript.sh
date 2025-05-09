@@ -19,7 +19,7 @@ sudo apt autoremove --purge kwalletmanager -y
 interactiveyn() { #Function for y/n user interact
 while true; do
 
-read -p "Do you want to proceed?" yn
+read -p "Do you want to proceed? [Y/N]" yn
 
 case $yn in 
 	[yY]) echo ok, we will proceed;
@@ -63,10 +63,19 @@ case $ID in
     ;;
 esac # ends case statement
 
-sudo tee /etc/apt/sources.list.d/testlist.list <<EOL 
-deb https://deb.debian.org/debian bookworm contrib non-free
-EOL
 #Adds non-free and non-free-firmware components
+
+BroadcomWifi=$(lspci | grep Netw | grep -o 'BCM[0-9]\+') #searches for Broadcom wifi driver for older Macs
+case $BroadcomWifi in
+    BCM4331) # Matches BCM4331
+        echo "This machine needs firmware for the Broacdom BCM4331";
+	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL 
+        deb https://deb.debian.org/debian bookworm contrib non-free
+	EOL;
+	sudo apt install firmware-b43-installer;
+ 	;;
+esac
+
 
 sudo apt update
 sudo apt upgrade -y
