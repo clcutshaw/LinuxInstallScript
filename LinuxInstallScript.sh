@@ -69,9 +69,10 @@ BroadcomWifi=$(lspci | grep Netw | grep -o 'BCM[0-9]\+') #searches for Broadcom 
 case $BroadcomWifi in
     BCM4331) # Matches BCM4331
         echo "This machine needs firmware for the Broacdom BCM4331";
-	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL 
+	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
+ 	#Adds non-free and non-free-firmware components
         deb https://deb.debian.org/debian bookworm contrib non-free
-EOL
+EOL 
 	sudo apt install firmware-b43-installer;
  	unset BroadcomWifi;
  	;;
