@@ -72,10 +72,13 @@ case $BroadcomWifi in
 	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
  	#Adds non-free and non-free-firmware components
         deb https://deb.debian.org/debian bookworm contrib non-free
-EOL 
+EOL
 	sudo apt install firmware-b43-installer;
  	unset BroadcomWifi;
  	;;
+   *) #No Match
+   	echo "This Machine does not use a Broadcom WiFi Driver";
+        ;;
 esac
 
 
