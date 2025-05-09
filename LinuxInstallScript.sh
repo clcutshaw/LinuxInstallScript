@@ -3,7 +3,7 @@
 #To be run after adding machine local user to sudo group
 echo "Welcome User. Beginning installation of your Linux Configuration"
 
-#Functions for automated install 
+#Functions for automated install
 
 debianinstall () { #Function for KDE install on Debian
 sudo apt install xorg -y
