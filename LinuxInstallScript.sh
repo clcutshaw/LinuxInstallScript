@@ -19,7 +19,7 @@ sudo apt autoremove --purge kwalletmanager -y
 interactiveyn() { #Function for y/n user interact
 while true; do
 
-read -p "Do you want to proceed? [Y/N]" yn
+read -pr "Do you want to proceed? [Y/N]" yn
 
 case $yn in 
 	[yY]) echo ok, we will proceed;
@@ -27,7 +27,7 @@ case $yn in
 	[nN]) echo Installation cancelled. Media will self delete, computer will restart.;
 		sudo shutdown -r +1;
 		sleep 8;
-		rm -- $0;;
+		rm -- "$0";;
 	* ) echo invalid response;;
 esac
 
@@ -63,21 +63,21 @@ case $ID in
     ;;
 esac # ends case statement
 
-#Adds non-free and non-free-firmware components
 
-BroadcomWifi=$(lspci | grep Netw | grep -o 'BCM[0-9]\+') #searches for Broadcom wifi driver for older Macs
+
+BroadcomWifi=$(lspci | grep Netw | grep -o 'BCM[0-9]\+') #searches for Broadcom wifi driver for older Macs, adds non-free and non-free-firmware components if needed.
 case $BroadcomWifi in
     BCM4331) # Matches BCM4331
         echo "This machine needs firmware for the Broacdom BCM4331";
 	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
- 	#Adds non-free and non-free-firmware components
         deb https://deb.debian.org/debian bookworm contrib non-free
 EOL
 	sudo apt install firmware-b43-installer;
  	unset BroadcomWifi;
  	;;
-   *) #No Match
+  *) #No Match
    	echo "This Machine does not use a Broadcom WiFi Driver";
+    	unset BroadcomWifi;
         ;;
 esac
 
@@ -123,4 +123,4 @@ echo "Installation complete. Media will now self delete. Have a good day."
 
 sudo shutdown -r +1
 sleep 8
-rm -- $0
+rm -- "$0"
