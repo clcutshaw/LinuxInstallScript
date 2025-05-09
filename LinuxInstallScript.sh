@@ -95,7 +95,7 @@ sudo snap install steam
 sudo snap install okular
 sudo snap install rpi-imager
 sudo snap install cura-slicer
-sudo snap install notepad-plus-plus
+sudo snap install sublime-text --classic
 sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
 
