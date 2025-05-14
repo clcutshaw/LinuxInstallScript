@@ -51,6 +51,9 @@ case $ID in
     ;; 
   kali) # Matches "kali"
     echo "This machine is running Kali Linux";
+    sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
+    deb https://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+EOL
     sleep 5;	
     ;;
   zorin) # Matches "zorin"
