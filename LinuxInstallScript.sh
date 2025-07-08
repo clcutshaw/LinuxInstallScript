@@ -94,7 +94,7 @@ sudo snap install notepad-plus-plus
 sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
 sudo snap install code --classic
-sudo powershell --classic
+sudo snap install powershell --classic
 
 #echo “Preparing cryptographic signatures for advance setup. Proceed?”
 
