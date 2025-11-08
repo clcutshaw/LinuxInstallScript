@@ -98,6 +98,7 @@ sudo snap install apple-music-for-linux
 sudo snap install audible-for-linux
 sudo snap install code --classic
 sudo snap install powershell --classic
+sudo snap install sublime-text --classic
 
 #echo “Preparing cryptographic signatures for advance setup. Proceed?”
 
