@@ -87,6 +87,7 @@ sudo nala install snapd -y
 sudo snap install discord
 sudo snap install signal-desktop
 sudo snap install bitwarden
+sudo snap install termius-app
 sudo snap install todoist
 sudo snap install steam
 sudo snap install okular
