@@ -83,6 +83,7 @@ sudo nala install barrier -y
 sudo nala install klavaro -y
 sudo nala install mirage -y
 sudo nala install remmina -y
+sudo nala install calibre -y
 sudo nala install snapd -y
 sudo snap install discord
 sudo snap install signal-desktop
