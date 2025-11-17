@@ -84,6 +84,7 @@ sudo nala install klavaro -y
 sudo nala install mirage -y
 sudo nala install remmina -y
 sudo nala install snapd -y
+sudo snap install snap-store
 sudo snap install discord
 sudo snap install signal-desktop
 sudo snap install bitwarden
