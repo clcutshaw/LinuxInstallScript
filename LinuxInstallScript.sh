@@ -112,4 +112,4 @@ echo "Installation complete. Media will now self delete. Have a good day."
 
 sudo shutdown -r +1
 sleep 8
-rm -- $0
+sudo rm -- $0 -y
