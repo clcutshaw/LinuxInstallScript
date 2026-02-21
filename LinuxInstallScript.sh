@@ -28,6 +28,34 @@ interactiveyn () { # Function for y/n user interact
     done
 }
 
+changehostname () {
+    echo
+    echo "Current hostname: $(hostname)"
+    echo
+
+    read -p "Do you want to change the hostname? [y/n]: " hn
+
+    case $hn in
+        [yY])
+            read -p "Enter new hostname (letters, numbers, hyphens only): " newhost
+
+            # Basic validation
+            if [[ ! "$newhost" =~ ^[a-zA-Z0-9-]+$ ]]; then
+                echo "Invalid hostname. Skipping hostname change."
+                return
+            fi
+
+            echo "Setting hostname to '$newhost'..."
+            sudo hostnamectl set-hostname "$newhost"
+
+            echo "Hostname changed successfully."
+            ;;
+        *)
+            echo "Hostname unchanged."
+            ;;
+    esac
+}
+
 issurface () {
     grep -qi "surface" /sys/class/dmi/id/product_name 2>/dev/null
 }
@@ -68,6 +96,8 @@ surfaceinstall () {
 # =========================
 
 interactiveyn
+
+changehostname
 
 sudo apt update
 sudo apt upgrade -y
