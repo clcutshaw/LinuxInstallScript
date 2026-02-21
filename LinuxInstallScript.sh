@@ -16,6 +16,9 @@ debianinstall () { # Function for KDE install on Debian
     sudo apt autoremove --purge konqueror kate kwalletmanager -y
 }
 
+kaliinstall () { # Function for repositories for Kali Install 
+}
+
 interactiveyn () { # Function for y/n user interact
     while true; do
         read -p "Do you want to proceed? [y/n]: " yn
@@ -28,15 +31,15 @@ interactiveyn () { # Function for y/n user interact
     done
 }
 
-issurface () {
+issurface () { # Determining if device is a Surface device
     grep -qi "surface" /sys/class/dmi/id/product_name 2>/dev/null
 }
 
-hassurfacekernel () {
+hassurfacekernel () { # Determining if device has Surface Kernel
     dpkg -l | grep -q linux-image-surface
 }
 
-surfaceinstall () {
+surfaceinstall () { # Installing Surface Kernel if it does not
     echo "Installing linux-surface kernel (official method)..."
 
     sudo apt install -y wget gnupg ca-certificates apt-transport-https
