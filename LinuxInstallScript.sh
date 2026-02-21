@@ -129,7 +129,6 @@ fi
 sudo apt update
 sudo apt upgrade -y
 sudo apt install nala -y
-
 sudo nala update
 sudo nala upgrade -y
 sudo nala install -y firefox-esr 
