@@ -132,11 +132,22 @@ sudo apt install nala -y
 
 sudo nala update
 sudo nala upgrade -y
-
-sudo nala install -y \
-    firefox-esr cpu-x hardinfo vim htop btop vlc thunderbird \
-    libreoffice handbrake flameshot klavaro mirage remmina putty snapd
-
+sudo nala install -y firefox-esr 
+sudo nala install -y cpu-x 
+sudo nala install -y hardinfo 
+sudo nala install -y vim
+sudo nala install -y htop
+sudo nala install -y btop 
+sudo nala install -y vlc
+sudo nala install -y thunderbird 
+sudo nala install -y libreoffice
+sudo nala install -y handbrake
+sudo nala install -y flameshot
+sudo nala install -y klavaro
+sudo nala install -y mirage
+sudo nala install -y remmina
+sudo nala install -y putty
+sudo nala install -y snapd
 sudo snap install snap-store
 sudo snap install discord
 sudo snap install signal-desktop
