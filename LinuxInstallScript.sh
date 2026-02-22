@@ -16,9 +16,6 @@ debianinstall () { # Function for KDE install on Debian
     sudo apt autoremove --purge konqueror kate kwalletmanager -y
 }
 
-#kaliinstall () { # Function for repositories for Kali Install 
-#}
-
 interactiveyn () { # Function for y/n user interact
     while true; do
         read -p "Do you want to proceed? [y/n]: " yn
