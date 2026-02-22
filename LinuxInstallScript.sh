@@ -105,25 +105,26 @@ get_installed_version () {
 
 install_third_party_apps () {
 
-    log() { echo "[$(date '+%F %T')] $*"; }
+    log () {
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+    }
 
     install_from_github_api () {
         local PKG="$1"
         local REPO="$2"
-        local ARCH="amd64"
+        local ASSET_PATTERN="${3:-amd64.*\.deb}"
 
         log "Checking $PKG..."
 
         local INSTALLED
         INSTALLED=$(dpkg-query -W -f='${Version}' "$PKG" 2>/dev/null || true)
 
-        # Query GitHub API for latest release
         local API_URL="https://api.github.com/repos/${REPO}/releases/latest"
 
         local DEB_URL
         DEB_URL=$(curl -s "$API_URL" \
             | grep '"browser_download_url"' \
-            | grep "${ARCH}.*\.deb" \
+            | grep -E "$ASSET_PATTERN" \
             | cut -d '"' -f 4 \
             | head -n 1)
 
@@ -140,12 +141,22 @@ install_third_party_apps () {
             return 0
         fi
 
+        local TMPDIR
         TMPDIR=$(mktemp -d)
+
         log "Downloading $PKG ($VERSION)..."
-        wget -qO "$TMPDIR/$PKG.deb" "$DEB_URL"
+        wget -qO "$TMPDIR/$PKG.deb" "$DEB_URL" || {
+            log "ERROR: Download failed for $PKG"
+            rm -rf "$TMPDIR"
+            return 1
+        }
 
         log "Installing $PKG..."
-        sudo apt install -y "$TMPDIR/$PKG.deb"
+        sudo apt install -y "$TMPDIR/$PKG.deb" || {
+            log "ERROR: Install failed for $PKG"
+            rm -rf "$TMPDIR"
+            return 1
+        }
 
         rm -rf "$TMPDIR"
         log "$PKG installation complete."
@@ -155,7 +166,7 @@ install_third_party_apps () {
 
     install_from_github_api "ipscan" "angryip/ipscan"
     install_from_github_api "libation" "rmcrackan/Libation"
-    install_from_github_api "github-desktop" "desktop/desktop"
+    install_from_github_api "github-desktop" "shiftkey/desktop" "GitHubDesktop-linux-amd64.*\.deb"
 
     log "All third-party applications processed."
 }
