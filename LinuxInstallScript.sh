@@ -233,6 +233,36 @@ if issurface && hassurfacekernel; then
 fi
 
 # =========================
+# Broadcom Driver Installer
+# =========================
+
+BroadcomWifi=$(lspci | grep Netw | grep -o 'BCM[0-9]\+') #searches for Broadcom wifi driver for older Macs, adds non-free and non-free-firmware components if needed.
+case $BroadcomWifi in
+    BCM4331) # Matches BCM4331
+        echo "This machine needs firmware for the Broacdom BCM4331";
+	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
+        deb https://deb.debian.org/debian bookworm contrib non-free
+EOL
+	sudo apt update
+	sudo apt install -y firmware-b43-installer;
+ 	unset BroadcomWifi;
+ 	;;
+  BCM4360) # Matches BCM4360
+        echo "This machine needs firmware for the Broacdom BCM4360";
+	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
+        deb https://deb.debian.org/debian bookworm contrib non-free
+EOL
+	sudo apt update
+	sudo apt install -y firmware-b43-installer;
+ 	unset BroadcomWifi;
+ 	;;
+  *) #No Match
+   	echo "This Machine does not use a Broadcom WiFi Driver";
+    	unset BroadcomWifi;
+        ;;
+esac
+
+# =========================
 # Software Installation
 # =========================
 
