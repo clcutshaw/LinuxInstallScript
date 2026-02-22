@@ -243,7 +243,8 @@ case $BroadcomWifi in
 	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
         deb https://deb.debian.org/debian bookworm contrib non-free
 EOL
-	sudo apt install firmware-b43-installer;
+	sudo apt update
+	sudo apt install -y firmware-b43-installer;
  	unset BroadcomWifi;
  	;;
   BCM4360) # Matches BCM4360
@@ -251,7 +252,8 @@ EOL
 	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
         deb https://deb.debian.org/debian bookworm contrib non-free
 EOL
-	sudo apt install firmware-b43-installer;
+	sudo apt update
+	sudo apt install -y firmware-b43-installer;
  	unset BroadcomWifi;
  	;;
   *) #No Match
