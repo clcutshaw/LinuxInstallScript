@@ -248,7 +248,7 @@ EOL
  	unset BroadcomWifi;
  	;;
   BCM4360) # Matches BCM4360
-        echo "This machine needs firmware for the Broacdom BCM4331";
+        echo "This machine needs firmware for the Broacdom BCM4360";
 	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
         deb https://deb.debian.org/debian bookworm contrib non-free
 EOL
