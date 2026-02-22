@@ -231,6 +231,7 @@ if issurface && hassurfacekernel; then
     echo "Surface kernel already installed. Continuing setup..."
     uname -a | grep -q surface || echo "WARNING: Not currently booted into surface kernel."
 fi
+
 # =========================
 # Broadcom Driver Installer
 # =========================
