@@ -28,7 +28,7 @@ interactiveyn () { # Function for y/n user interact
     done
 }
 
-changehostname () {
+changehostname () { #Function for hotname change
     echo
     echo "Current hostname: $(hostname)"
     echo
@@ -56,7 +56,7 @@ changehostname () {
     esac
 }
 
-issurface () {
+issurface () { #determining if device is a Surface
     grep -qi "surface" /sys/class/dmi/id/product_name 2>/dev/null
 }
 
@@ -142,6 +142,7 @@ install_third_party_apps () {
     install_from_github_deb "github-desktop" \
         "https://github.com/desktop/desktop" \
         'https://[^"]+amd64\.deb'
+}
 # =========================
 # Begin Execution
 # =========================
@@ -245,6 +246,7 @@ sudo snap install audible-for-linux
 sudo snap install code --classic
 sudo snap install powershell --classic
 sudo snap install sublime-text --classic
+install_third_party_apps
 
 sudo apt autoclean
 
