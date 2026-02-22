@@ -107,55 +107,42 @@ install_third_party_apps () {
 
     log() { echo "[$(date '+%F %T')] $*"; }
 
-    install_from_github_deb () {
+    install_from_github_api () {
         local PKG="$1"
         local REPO="$2"
-        local FILE_PATTERN="$3"
+        local ARCH="amd64"
 
         log "Checking $PKG..."
 
-        # Determine installed version
         local INSTALLED
         INSTALLED=$(dpkg-query -W -f='${Version}' "$PKG" 2>/dev/null || true)
 
-        # Determine latest release URL
-        # Use GitHub redirect: /releases/latest/download/<file>
-        # First, get the "latest" release tag
-        local TAG
-        TAG=$(curl -s -L -o /dev/null -w "%{url_effective}" "$REPO/releases/latest" | awk -F/ '{print $NF}')
-        if [[ -z "$TAG" ]]; then
-            log "ERROR: Could not determine latest release tag for $PKG"
+        # Query GitHub API for latest release
+        local API_URL="https://api.github.com/repos/${REPO}/releases/latest"
+
+        local DEB_URL
+        DEB_URL=$(curl -s "$API_URL" \
+            | grep '"browser_download_url"' \
+            | grep "${ARCH}.*\.deb" \
+            | cut -d '"' -f 4 \
+            | head -n 1)
+
+        if [[ -z "$DEB_URL" ]]; then
+            log "ERROR: Could not find .deb asset for $PKG"
             return 1
         fi
 
-        # Construct direct download URL matching pattern
-        local URL
-        URL=$(curl -s -L "$REPO/releases/latest/download/" | grep -Eo "$FILE_PATTERN" | head -n1)
-
-        # Fallback: if pattern fails, try building URL manually
-        if [[ -z "$URL" ]]; then
-            # Use the latest tag and file pattern
-            URL="$REPO/releases/download/$TAG/$(basename "$FILE_PATTERN")"
-        fi
-
-        if [[ -z "$URL" ]]; then
-            log "ERROR: Could not find download URL for $PKG"
-            return 1
-        fi
-
-        # Determine version from URL
         local VERSION
-        VERSION=$(basename "$URL" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1)
+        VERSION=$(basename "$DEB_URL" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1)
 
         if [[ -n "$INSTALLED" && "$INSTALLED" == "$VERSION"* ]]; then
             log "$PKG already up to date ($INSTALLED)"
             return 0
         fi
 
-        # Download and install
         TMPDIR=$(mktemp -d)
         log "Downloading $PKG ($VERSION)..."
-        wget --content-disposition -O "$TMPDIR/$PKG.deb" "$URL"
+        wget -qO "$TMPDIR/$PKG.deb" "$DEB_URL"
 
         log "Installing $PKG..."
         sudo apt install -y "$TMPDIR/$PKG.deb"
@@ -166,20 +153,9 @@ install_third_party_apps () {
 
     log "Installing third-party applications..."
 
-    # Angry IP Scanner
-    install_from_github_deb "ipscan" \
-        "https://github.com/angryip/ipscan" \
-        '_amd64\.deb$'
-
-    # Libation
-    install_from_github_deb "libation" \
-        "https://github.com/rmcrackan/Libation" \
-        '_amd64\.deb$'
-
-    # GitHub Desktop
-    install_from_github_deb "github-desktop" \
-        "https://github.com/desktop/desktop" \
-        '_amd64\.deb$'
+    install_from_github_api "ipscan" "angryip/ipscan"
+    install_from_github_api "libation" "rmcrackan/Libation"
+    install_from_github_api "github-desktop" "desktop/desktop"
 
     log "All third-party applications processed."
 }
