@@ -94,6 +94,57 @@ surfaceinstall () { # Installing Surface Kernel if it does not
     sudo update-grub
 }
 
+########################################
+# Version helper
+########################################
+
+get_installed_version () {
+    dpkg-query -W -f='${Version}' "$1" 2>/dev/null || true
+}
+
+########################################
+# Third-party GitHub apps
+########################################
+
+install_third_party_apps () {
+
+    install_from_github_deb () {
+        local PKG="$1"
+        local REPO="$2"
+        local REGEX="$3"
+
+        INSTALLED=$(get_installed_version "$PKG")
+
+        URL=$(curl -s "$REPO/releases/latest" | grep -Eo "$REGEX" | head -n 1)
+        [[ -z "$URL" ]] && echo "Failed to find $PKG" && return
+
+        VERSION=$(basename "$URL" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1)
+
+        if [[ -n "$INSTALLED" && "$INSTALLED" == "$VERSION"* ]]; then
+            echo "$PKG already up to date ($INSTALLED)"
+            return
+        fi
+
+        echo "Installing $PKG ($VERSION)"
+        TMPDIR=$(mktemp -d)
+        wget -qO "$TMPDIR/$PKG.deb" "$URL"
+        sudo apt install -y "$TMPDIR/$PKG.deb"
+        rm -rf "$TMPDIR"
+    }
+
+    echo "Installing third-party applications..."
+
+    install_from_github_deb "ipscan" \
+        "https://github.com/angryip/ipscan" \
+        'https://[^"]+_amd64\.deb'
+
+    install_from_github_deb "libation" \
+        "https://github.com/rmcrackan/Libation" \
+        'https://[^"]+_amd64\.deb'
+
+    install_from_github_deb "github-desktop" \
+        "https://github.com/desktop/desktop" \
+        'https://[^"]+amd64\.deb'
 # =========================
 # Begin Execution
 # =========================
