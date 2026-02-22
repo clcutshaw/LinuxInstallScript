@@ -105,44 +105,85 @@ get_installed_version () {
 
 install_third_party_apps () {
 
+    log() { echo "[$(date '+%F %T')] $*"; }
+
     install_from_github_deb () {
         local PKG="$1"
         local REPO="$2"
-        local REGEX="$3"
+        local FILE_PATTERN="$3"
 
-        INSTALLED=$(get_installed_version "$PKG")
+        log "Checking $PKG..."
 
-        URL=$(curl -s "$REPO/releases/latest" | grep -Eo "$REGEX" | head -n 1)
-        [[ -z "$URL" ]] && echo "Failed to find $PKG" && return
+        # Determine installed version
+        local INSTALLED
+        INSTALLED=$(dpkg-query -W -f='${Version}' "$PKG" 2>/dev/null || true)
 
+        # Determine latest release URL
+        # Use GitHub redirect: /releases/latest/download/<file>
+        # First, get the "latest" release tag
+        local TAG
+        TAG=$(curl -s -L -o /dev/null -w "%{url_effective}" "$REPO/releases/latest" | awk -F/ '{print $NF}')
+        if [[ -z "$TAG" ]]; then
+            log "ERROR: Could not determine latest release tag for $PKG"
+            return 1
+        fi
+
+        # Construct direct download URL matching pattern
+        local URL
+        URL=$(curl -s -L "$REPO/releases/latest/download/" | grep -Eo "$FILE_PATTERN" | head -n1)
+
+        # Fallback: if pattern fails, try building URL manually
+        if [[ -z "$URL" ]]; then
+            # Use the latest tag and file pattern
+            URL="$REPO/releases/download/$TAG/$(basename "$FILE_PATTERN")"
+        fi
+
+        if [[ -z "$URL" ]]; then
+            log "ERROR: Could not find download URL for $PKG"
+            return 1
+        fi
+
+        # Determine version from URL
+        local VERSION
         VERSION=$(basename "$URL" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1)
 
         if [[ -n "$INSTALLED" && "$INSTALLED" == "$VERSION"* ]]; then
-            echo "$PKG already up to date ($INSTALLED)"
-            return
+            log "$PKG already up to date ($INSTALLED)"
+            return 0
         fi
 
-        echo "Installing $PKG ($VERSION)"
+        # Download and install
         TMPDIR=$(mktemp -d)
-        wget -qO "$TMPDIR/$PKG.deb" "$URL"
+        log "Downloading $PKG ($VERSION)..."
+        wget --content-disposition -O "$TMPDIR/$PKG.deb" "$URL"
+
+        log "Installing $PKG..."
         sudo apt install -y "$TMPDIR/$PKG.deb"
+
         rm -rf "$TMPDIR"
+        log "$PKG installation complete."
     }
 
-    echo "Installing third-party applications..."
+    log "Installing third-party applications..."
 
+    # Angry IP Scanner
     install_from_github_deb "ipscan" \
         "https://github.com/angryip/ipscan" \
-        'https://[^"]+_amd64\.deb'
+        '_amd64\.deb$'
 
+    # Libation
     install_from_github_deb "libation" \
         "https://github.com/rmcrackan/Libation" \
-        'https://[^"]+_amd64\.deb'
+        '_amd64\.deb$'
 
+    # GitHub Desktop
     install_from_github_deb "github-desktop" \
         "https://github.com/desktop/desktop" \
-        'https://[^"]+amd64\.deb'
+        '_amd64\.deb$'
+
+    log "All third-party applications processed."
 }
+
 # =========================
 # Begin Execution
 # =========================
