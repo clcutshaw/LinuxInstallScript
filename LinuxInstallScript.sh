@@ -17,7 +17,63 @@ debianinstall () { # Function for KDE install on Debian
 }
 
 kaliinstall () { # Function for repositories for Kali Install 
-}
+    add_apt_repo() {
+        # Required arguments
+        local repo_name="$1"     # short name, e.g. debian-trixie
+        local repo_url="$2"      # e.g. http://deb.debian.org/debian
+        local distro="$3"        # e.g. trixie
+        local components="$4"   # e.g. main contrib non-free
+    
+        # Optional arguments
+        local key_url="$5"       # empty if key already exists
+        local pin_priority="$6" # empty to disable pinning (e.g. 100)
+    
+        local list_file="/etc/apt/sources.list.d/${repo_name}.list"
+        local keyring="/usr/share/keyrings/${repo_name}-archive-keyring.gpg"
+        local pin_file="/etc/apt/preferences.d/${repo_name}"
+    
+        echo "[*] Configuring APT repository: ${repo_name}"
+    
+        # --- Signing key (optional) ---
+        if [[ -n "$key_url" ]]; then
+            if [[ ! -f "$keyring" ]]; then
+                echo "  - Installing signing key"
+                curl -fsSL "$key_url" \
+                    | gpg --dearmor \
+                    | tee "$keyring" > /dev/null
+            else
+                echo "  - Signing key already present"
+            fi
+        fi
+    
+        # --- Repository file ---
+        if [[ ! -f "$list_file" ]]; then
+            echo "  - Adding repository source"
+            if [[ -n "$key_url" ]]; then
+                echo "deb [signed-by=$keyring] $repo_url $distro $components" \
+                    | tee "$list_file" > /dev/null
+            else
+                echo "deb $repo_url $distro $components" \
+                    | tee "$list_file" > /dev/null
+            fi
+        else
+            echo "  - Repository already exists"
+        fi
+    
+        # --- APT pinning (optional, recommended for Kali + Debian mixing) ---
+        if [[ -n "$pin_priority" ]]; then
+            if [[ ! -f "$pin_file" ]]; then
+                echo "  - Adding APT pin (priority: $pin_priority)"
+                cat <<EOF | tee "$pin_file" > /dev/null
+    Package: *
+    Pin: release n=$distro
+    Pin-Priority: $pin_priority
+    EOF
+            else
+                echo "  - Pinning already configured"
+            fi
+        fi
+    }
 
 interactiveyn () { # Function for y/n user interact
     while true; do
