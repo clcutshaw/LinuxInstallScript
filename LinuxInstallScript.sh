@@ -102,7 +102,6 @@ get_installed_version () {
 ########################################
 # Third-party GitHub apps
 ########################################
-
 install_third_party_apps () {
 
     log () {
@@ -119,17 +118,24 @@ install_third_party_apps () {
         local INSTALLED
         INSTALLED=$(dpkg-query -W -f='${Version}' "$PKG" 2>/dev/null || true)
 
-        local API_URL="https://api.github.com/repos/${REPO}/releases/latest"
+        local API_URL="https://api.github.com/repos/${REPO}/releases?per_page=20"
 
+        # Select the newest NON-prerelease release containing a matching .deb
         local DEB_URL
-        DEB_URL=$(curl -s "$API_URL" \
-            | grep '"browser_download_url"' \
-            | grep -E "$ASSET_PATTERN" \
-            | cut -d '"' -f 4 \
-            | head -n 1)
+        DEB_URL=$(curl -s "$API_URL" | awk '
+            /"prerelease":/ { prerelease=$2 }
+            /"browser_download_url":/ {
+                url=$4
+                gsub(/"/, "", url)
+                if (prerelease == "false," && url ~ /'"$ASSET_PATTERN"'/) {
+                    print url
+                    exit
+                }
+            }
+        ')
 
         if [[ -z "$DEB_URL" ]]; then
-            log "ERROR: Could not find .deb asset for $PKG"
+            log "ERROR: Could not find stable .deb asset for $PKG"
             return 1
         fi
 
@@ -164,10 +170,27 @@ install_third_party_apps () {
 
     log "Installing third-party applications..."
 
-    install_from_github_api "ipscan" "angryip/ipscan"
-    install_from_github_api "libation" "rmcrackan/Libation"
-    install_from_github_api "github-desktop" "shiftkey/desktop" "GitHubDesktop-linux-amd64.*\.deb"
-	install_from_github_api "mullvad-vpn" "mullvad/mullvadvpn-app" "MullvadVPN-.*_amd64\.deb"
+    # Angry IP Scanner (stable)
+    install_from_github_api \
+        "ipscan" \
+        "angryip/ipscan"
+
+    # Libation (stable)
+    install_from_github_api \
+        "libation" \
+        "rmcrackan/Libation"
+
+    # GitHub Desktop (Linux builds live in shiftkey fork)
+    install_from_github_api \
+        "github-desktop" \
+        "shiftkey/desktop" \
+        "GitHubDesktop-linux-amd64.*\.deb"
+
+    # Mullvad VPN (stable desktop release only)
+    install_from_github_api \
+        "mullvad-vpn" \
+        "mullvad/mullvadvpn-app" \
+        "MullvadVPN-.*_amd64\.deb"
 
     log "All third-party applications processed."
 }
