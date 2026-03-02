@@ -167,6 +167,7 @@ install_third_party_apps () {
     install_from_github_api "ipscan" "angryip/ipscan"
     install_from_github_api "libation" "rmcrackan/Libation"
     install_from_github_api "github-desktop" "shiftkey/desktop" "GitHubDesktop-linux-amd64.*\.deb"
+	install_from_github_api "mullvad-vpn" "mullvad/mullvad-vpn"
 
     log "All third-party applications processed."
 }
