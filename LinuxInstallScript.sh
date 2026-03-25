@@ -28,7 +28,7 @@ interactiveyn () { # Function for y/n user interact
     done
 }
 
-changehostname () { #Function for hotname change
+changehostname () {
     echo
     echo "Current hostname: $(hostname)"
     echo
@@ -39,16 +39,25 @@ changehostname () { #Function for hotname change
         [yY])
             read -p "Enter new hostname (letters, numbers, hyphens only): " newhost
 
-            # Basic validation
+            # Validation
             if [[ ! "$newhost" =~ ^[a-zA-Z0-9-]+$ ]]; then
                 echo "Invalid hostname. Skipping hostname change."
                 return
             fi
 
+            oldhost=$(hostname)
+
             echo "Setting hostname to '$newhost'..."
             sudo hostnamectl set-hostname "$newhost"
 
-            echo "Hostname changed successfully."
+            # Fix /etc/hosts
+            if grep -q "127.0.1.1" /etc/hosts; then
+                sudo sed -i "s/^127\.0\.1\.1.*/127.0.1.1\t$newhost/" /etc/hosts
+            else
+                echo -e "127.0.1.1\t$newhost" | sudo tee -a /etc/hosts > /dev/null
+            fi
+
+            echo "Hostname updated from '$oldhost' to '$newhost'."
             ;;
         *)
             echo "Hostname unchanged."
