@@ -335,6 +335,7 @@ sudo nala install -y klavaro
 sudo nala install -y mirage
 sudo nala install -y remmina
 sudo nala install -y putty
+sudo nala install -y gparted
 sudo nala install -y curl
 sudo nala install -y snapd
 sudo snap install snap-store
