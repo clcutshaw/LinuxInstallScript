@@ -101,6 +101,48 @@ surfaceinstall () { # Installing Surface Kernel if it does not
 }
 
 ########################################
+# Apple T2 Detection
+########################################
+
+ist2mac () {
+    lspci -nn | grep -q "106b:1801"
+}
+
+hast2kernel () {
+    dpkg -l | grep -q "^ii.*linux-t2"
+}
+
+t2install () {
+
+    echo "Installing Apple T2 support..."
+
+    sudo apt install -y curl gnupg
+
+    curl -s --compressed "https://adityagarg8.github.io/t2-ubuntu-repo/KEY.gpg" \
+        | gpg --dearmor \
+        | sudo tee /etc/apt/trusted.gpg.d/t2-ubuntu-repo.gpg >/dev/null
+
+    sudo curl -s --compressed \
+        -o /etc/apt/sources.list.d/t2.list \
+        "https://adityagarg8.github.io/t2-ubuntu-repo/t2.list"
+
+    source /etc/os-release
+
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/t2-ubuntu-repo.gpg] https://github.com/AdityaGarg8/t2-ubuntu-repo/releases/download/${VERSION_CODENAME} ./" \
+        | sudo tee -a /etc/apt/sources.list.d/t2.list
+
+    sudo apt update
+
+    sudo apt install -y \
+        linux-t2 \
+        apple-t2-audio-config \
+        apple-firmware-script \
+        t2fanrd
+
+    sudo update-grub
+}
+
+########################################
 # Version helper
 ########################################
 
@@ -282,34 +324,114 @@ if issurface && hassurfacekernel; then
 fi
 
 # =========================
+# Apple T2 Device Handling
+# =========================
+
+if ist2mac && ! hast2kernel; then
+
+    MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
+
+    echo
+    echo "======================================================"
+    echo " Apple T2 Mac detected: $MODEL"
+    echo
+    echo " Installing T2 kernel and support packages"
+    echo "======================================================"
+    echo
+
+    t2install
+
+    echo
+    echo "======================================================"
+    echo " Apple T2 support installed"
+    echo
+    echo " PLEASE REBOOT THE SYSTEM MANUALLY"
+    echo
+    echo " After reboot run:"
+    echo
+    echo " sudo get-wifi-firmware"
+    echo
+    echo " Then run this script again."
+    echo "======================================================"
+    echo
+
+    read -p "Press ENTER to exit the installer now..." _
+    exit 0
+fi
+
+if ist2mac && hast2kernel; then
+
+    MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
+
+    echo "Apple T2 kernel already installed on $MODEL."
+
+    uname -r | grep -q t2 || \
+        echo "WARNING: Not currently booted into a T2 kernel."
+fi
+
+# =========================
 # Broadcom Driver Installer
 # =========================
 
-BroadcomWifi=$(lspci | grep Netw | grep -o 'BCM[0-9]\+') #searches for Broadcom wifi driver for older Macs, adds non-free and non-free-firmware components if needed.
-case $BroadcomWifi in
-    BCM4331) # Matches BCM4331
-        echo "This machine needs firmware for the Broacdom BCM4331";
-	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
-        deb https://deb.debian.org/debian bookworm contrib non-free
+if ist2mac; then
+
+    echo
+    echo "======================================================"
+    echo " Apple T2 Mac detected"
+    echo
+    echo " WiFi firmware is handled by:"
+    echo " sudo get-wifi-firmware"
+    echo
+    echo " This will be available after booting"
+    echo " into the linux-t2 kernel."
+    echo "======================================================"
+    echo
+
+else
+
+    BroadcomWifi=$(lspci -nn | grep -o 'BCM[0-9]\+' | head -1)
+
+    case $BroadcomWifi in
+
+        BCM4331)
+            echo "This machine needs firmware for the Broadcom BCM4331"
+
+            source /etc/os-release
+
+            sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
+deb https://deb.debian.org/debian $VERSION_CODENAME contrib non-free non-free-firmware
 EOL
-	sudo apt update
-	sudo apt install -y firmware-b43-installer;
- 	unset BroadcomWifi;
- 	;;
-  BCM4360) # Matches BCM4360
-        echo "This machine needs firmware for the Broacdom BCM4360";
-	sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
-        deb https://deb.debian.org/debian bookworm contrib non-free
+
+            sudo apt update
+            sudo apt install -y firmware-b43-installer
+
+            unset BroadcomWifi
+            ;;
+
+        BCM4360)
+            echo "This machine needs firmware for the Broadcom BCM4360"
+
+            source /etc/os-release
+
+            sudo tee /etc/apt/sources.list.d/testlist.list <<EOL
+deb https://deb.debian.org/debian $VERSION_CODENAME contrib non-free non-free-firmware
 EOL
-	sudo apt update
-	sudo apt install -y firmware-b43-installer;
- 	unset BroadcomWifi;
- 	;;
-  *) #No Match
-   	echo "This Machine does not use a Broadcom WiFi Driver";
-    	unset BroadcomWifi;
-        ;;
-esac
+
+            sudo apt update
+            sudo apt install -y firmware-b43-installer
+
+            unset BroadcomWifi
+            ;;
+
+        *)
+            echo "This Machine does not use a Broadcom WiFi Driver"
+
+            unset BroadcomWifi
+            ;;
+
+    esac
+
+fi
 
 # =========================
 # Software Installation
