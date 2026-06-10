@@ -121,7 +121,7 @@ install_third_party_apps () {
     install_from_github_api () {
         local PKG="$1"
         local REPO="$2"
-        local ASSET_PATTERN="${3:-amd64.*\.deb}"
+        local ASSET_PATTERN="${3:-amd64.*\.deb$}"
 
         log "Checking $PKG..."
 
@@ -131,14 +131,16 @@ install_third_party_apps () {
         local API_URL="https://api.github.com/repos/${REPO}/releases/latest"
 
         local DEB_URL
-        DEB_URL=$(curl -fsSL "$API_URL" \
+        DEB_URL=$(
+            curl -fsSL "$API_URL" \
             | grep '"browser_download_url"' \
-            | grep -E "$ASSET_PATTERN" \
             | cut -d '"' -f 4 \
-            | head -n 1)
+            | grep -E "$ASSET_PATTERN" \
+            | head -n 1
+        )
 
         if [[ -z "$DEB_URL" ]]; then
-            log "ERROR: Could not find .deb asset for $PKG"
+            log "ERROR: Could not find matching .deb asset for $PKG"
             return 1
         fi
 
@@ -180,10 +182,23 @@ install_third_party_apps () {
 
     log "Installing third-party applications..."
 
-    install_from_github_api "ipscan" "angryip/ipscan"
-    install_from_github_api "libation" "rmcrackan/Libation"
-    install_from_github_api "github-desktop" "shiftkey/desktop" "GitHubDesktop-linux-amd64.*\.deb"
-    install_from_github_api "rpi-imager" "raspberrypi/rpi-imager"
+    install_from_github_api \
+        "ipscan" \
+        "angryip/ipscan"
+
+    install_from_github_api \
+        "libation" \
+        "rmcrackan/Libation"
+
+    install_from_github_api \
+        "github-desktop" \
+        "shiftkey/desktop" \
+        "GitHubDesktop-linux-amd64.*\.deb$"
+
+    install_from_github_api \
+        "rpi-imager" \
+        "raspberrypi/rpi-imager" \
+        "/rpi-imager_[0-9].*_amd64\.deb$"
 
     log "All third-party applications processed."
 }
@@ -364,7 +379,6 @@ sudo snap install barrier-kvm
 sudo snap install todoist
 sudo snap install steam
 sudo snap install okular
-sudo snap install rpi-imager
 sudo snap install cura-slicer
 sudo snap install notepad-plus-plus
 sudo snap install apple-music-for-linux
