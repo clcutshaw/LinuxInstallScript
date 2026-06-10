@@ -111,6 +111,7 @@ get_installed_version () {
 ########################################
 # Third-party GitHub apps
 ########################################
+
 install_third_party_apps () {
 
     log () {
@@ -125,12 +126,12 @@ install_third_party_apps () {
         log "Checking $PKG..."
 
         local INSTALLED
-        INSTALLED=$(dpkg-query -W -f='${Version}' "$PKG" 2>/dev/null || true)
+        INSTALLED=$(get_installed_version "$PKG")
 
         local API_URL="https://api.github.com/repos/${REPO}/releases/latest"
 
         local DEB_URL
-        DEB_URL=$(curl -s "$API_URL" \
+        DEB_URL=$(curl -fsSL "$API_URL" \
             | grep '"browser_download_url"' \
             | grep -E "$ASSET_PATTERN" \
             | cut -d '"' -f 4 \
@@ -141,25 +142,40 @@ install_third_party_apps () {
             return 1
         fi
 
-        local VERSION
-        VERSION=$(basename "$DEB_URL" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1)
-
-        if [[ -n "$INSTALLED" && "$INSTALLED" == "$VERSION"* ]]; then
-            log "$PKG already up to date ($INSTALLED)"
-            return 0
-        fi
-
         local TMPDIR
         TMPDIR=$(mktemp -d)
 
-        log "Downloading $PKG ($VERSION)..."
+        log "Downloading $PKG..."
         wget -qO "$TMPDIR/$PKG.deb" "$DEB_URL"
 
-        log "Installing $PKG..."
-        sudo apt install -y "$TMPDIR/$PKG.deb"
+        if ! dpkg-deb --info "$TMPDIR/$PKG.deb" >/dev/null 2>&1; then
+            log "ERROR: Downloaded file is not a valid deb package."
+            rm -rf "$TMPDIR"
+            return 1
+        fi
+
+        local VERSION
+        VERSION=$(dpkg-deb -f "$TMPDIR/$PKG.deb" Version)
+
+        if [[ -n "$INSTALLED" ]]; then
+            if dpkg --compare-versions "$INSTALLED" ge "$VERSION"; then
+                log "$PKG already up to date ($INSTALLED)"
+                rm -rf "$TMPDIR"
+                return 0
+            fi
+        fi
+
+        log "Installing $PKG ($VERSION)..."
+
+        if sudo apt install -y "$TMPDIR/$PKG.deb"; then
+            log "$PKG installation complete."
+        else
+            log "ERROR: Failed to install $PKG"
+            rm -rf "$TMPDIR"
+            return 1
+        fi
 
         rm -rf "$TMPDIR"
-        log "$PKG installation complete."
     }
 
     log "Installing third-party applications..."
@@ -167,6 +183,7 @@ install_third_party_apps () {
     install_from_github_api "ipscan" "angryip/ipscan"
     install_from_github_api "libation" "rmcrackan/Libation"
     install_from_github_api "github-desktop" "shiftkey/desktop" "GitHubDesktop-linux-amd64.*\.deb"
+    install_from_github_api "rpi-imager" "raspberrypi/rpi-imager"
 
     log "All third-party applications processed."
 }
