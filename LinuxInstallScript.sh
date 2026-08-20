@@ -199,6 +199,11 @@ install_third_party_apps () {
         "rpi-imager" \
         "raspberrypi/rpi-imager" \
         "/rpi-imager_[0-9].*_amd64\.deb$"
+	    
+	install_from_github_api \
+        "balena-etcher" \
+        "balena-io/etcher" \
+        "balena-etcher_[0-9].*_amd64\.deb$"
 
     log "All third-party applications processed."
 }
