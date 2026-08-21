@@ -374,6 +374,7 @@ sudo nala install -y remmina
 sudo nala install -y putty
 sudo nala install -y gparted
 sudo nala install -y curl
+sudo nala install -y kitty
 sudo nala install -y snapd
 sudo snap install snap-store
 sudo snap install discord
