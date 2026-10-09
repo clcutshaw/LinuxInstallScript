@@ -187,9 +187,7 @@ install_snap () {
     # Install the Snap Store
     local APPS=(
         snap-store
-        discord
         signal-desktop
-        bitwarden
         termius-app
         barrier-kvm
         todoist
