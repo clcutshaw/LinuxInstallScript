@@ -126,7 +126,8 @@ install_default_apps () {
 
     # Default Debian applications
     local APPS=(
-        firefox-esr
+        nala
+		firefox-esr
         cpu-x
         hardinfo
         vim
