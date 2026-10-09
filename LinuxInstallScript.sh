@@ -119,13 +119,15 @@ install_default_apps () {
     echo " Installing Default Applications"
     echo "========================================"
 
-    # Install and update Nala
-    sudo apt update || return 1
-    sudo apt upgrade -y || return 1
-    sudo apt install -y nala || return 1
+    # Install Nala if it is missing
+	if ! command -v nala >/dev/null 2>&1; then
+    	sudo apt update || return 1
+    	sudo apt install -y nala || return 1
+	fi
 
-    sudo nala update || return 1
-    sudo nala upgrade -y || return 1
+	# Update and upgrade using Nala
+	sudo nala update || return 1
+	sudo nala upgrade -y || return 1
 
     # Default Debian applications
     local APPS=(
