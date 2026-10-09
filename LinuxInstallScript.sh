@@ -108,6 +108,168 @@ get_installed_version () {
     dpkg-query -W -f='${Version}' "$1" 2>/dev/null || true
 }
 
+
+# =========================
+# Default Applications (APT/Nala)
+# =========================
+
+install_default_apps () {
+    echo
+    echo "========================================"
+    echo " Installing Default Applications"
+    echo "========================================"
+
+    # Install and update Nala
+    sudo apt update || return 1
+    sudo apt upgrade -y || return 1
+    sudo apt install -y nala || return 1
+
+    sudo nala update || return 1
+    sudo nala upgrade -y || return 1
+
+    # Default Debian applications
+    local APPS=(
+        firefox-esr
+        cpu-x
+        hardinfo
+        vim
+        htop
+        btop
+        vlc
+        thunderbird
+        libreoffice
+        handbrake
+        flameshot
+        klavaro
+        mirage
+        remmina
+        putty
+        gparted
+        curl
+        kitty
+		okular
+    )
+
+    echo "Installing default applications..."
+
+    if sudo nala install -y "${APPS[@]}"; then
+        echo "Default application installation complete."
+    else
+        echo "ERROR: Default application installation failed."
+        return 1
+    fi
+}
+
+
+# =========================
+# Snap Applications
+# =========================
+
+install_snap () {
+    echo
+    echo "========================================"
+    echo " Installing Snap Applications"
+    echo "========================================"
+
+    # Install Snap and KDE Discover integration
+    if ! sudo nala install -y snapd plasma-discover-backend-snap; then
+        echo "ERROR: Failed to install Snap support."
+        return 1
+    fi
+
+    # Enable the Snap socket
+    if ! sudo systemctl enable --now snapd.socket; then
+        echo "WARNING: Could not enable snapd.socket."
+    fi
+
+    # Install the Snap Store
+    local APPS=(
+        snap-store
+        discord
+        signal-desktop
+        bitwarden
+        termius-app
+        barrier-kvm
+        todoist
+        steam
+        cura-slicer
+        notepad-plus-plus
+        apple-music-for-linux
+        audible-for-linux
+    )
+
+    local CLASSIC_APPS=(
+        code
+        powershell
+        sublime-text
+    )
+
+    local APP
+
+    for APP in "${APPS[@]}"; do
+        echo "Installing Snap: $APP"
+
+        if ! sudo snap install "$APP"; then
+            echo "WARNING: Failed to install Snap: $APP"
+        fi
+    done
+
+    # Applications requiring classic confinement
+    for APP in "${CLASSIC_APPS[@]}"; do
+        echo "Installing classic Snap: $APP"
+
+        if ! sudo snap install "$APP" --classic; then
+            echo "WARNING: Failed to install classic Snap: $APP"
+        fi
+    done
+
+    echo "Snap application processing complete."
+}
+
+
+# =========================
+# Flatpak Applications
+# =========================
+
+install_flatpak () {
+    echo
+    echo "========================================"
+    echo " Installing Flatpak Applications"
+    echo "========================================"
+
+    # Install Flatpak and KDE Discover integration
+    if ! sudo nala install -y flatpak plasma-discover-backend-flatpak; then
+        echo "ERROR: Failed to install Flatpak support."
+        return 1
+    fi
+
+    # Configure the system-wide Flathub repository
+    if ! sudo flatpak remote-add --if-not-exists --system \
+        flathub https://dl.flathub.org/repo/flathub.flatpakrepo; then
+        echo "ERROR: Failed to configure Flathub."
+        return 1
+    fi
+
+    # Flatpak application IDs
+  local APPS=(
+    "com.bambulab.BambuStudio"
+    "com.discordapp.Discord"
+    "com.bitwarden.desktop"
+)
+
+    local APP
+
+    for APP in "${APPS[@]}"; do
+        echo "Installing Flatpak: $APP"
+
+        if ! sudo flatpak install --system --assumeyes flathub "$APP"; then
+            echo "WARNING: Failed to install Flatpak: $APP"
+        fi
+    done
+
+    echo "Flatpak application processing complete."
+}
+
 ########################################
 # Third-party GitHub apps
 ########################################
@@ -348,53 +510,27 @@ EOL
         ;;
 esac
 
+
 # =========================
 # Software Installation
 # =========================
 
-sudo apt update
-sudo apt upgrade -y
-sudo apt install nala -y
-sudo nala update
-sudo nala upgrade -y
-sudo nala install -y firefox-esr 
-sudo nala install -y cpu-x 
-sudo nala install -y hardinfo 
-sudo nala install -y vim
-sudo nala install -y htop
-sudo nala install -y btop 
-sudo nala install -y vlc
-sudo nala install -y thunderbird 
-sudo nala install -y libreoffice
-sudo nala install -y handbrake
-sudo nala install -y flameshot
-sudo nala install -y klavaro
-sudo nala install -y mirage
-sudo nala install -y remmina
-sudo nala install -y putty
-sudo nala install -y gparted
-sudo nala install -y curl
-sudo nala install -y kitty
-sudo nala install -y snapd
-sudo snap install snap-store
-sudo snap install discord
-sudo snap install signal-desktop
-sudo snap install bitwarden
-sudo snap install termius-app
-sudo snap install barrier-kvm
-sudo snap install todoist
-sudo snap install steam
-sudo snap install okular
-sudo snap install cura-slicer
-sudo snap install notepad-plus-plus
-sudo snap install apple-music-for-linux
-sudo snap install audible-for-linux
-sudo snap install code --classic
-sudo snap install powershell --classic
-sudo snap install sublime-text --classic
+#Apps best installed by APT/Nala
+install_default_apps || echo "WARNING: Default app installation encountered errors."
+
+#Apps best installed by Snap
+install_snap || echo "WARNING: Snap installation encountered errors."
+
+# Apps best installed by Flatpak
+install_flatpak || echo "WARNING: Flatpak installation encountered errors."
+
+# Third-party GitHub .deb applications
 install_third_party_apps
+
+# Mullvad VPN stable release
 install_mullvad_stable
 
+# Clean the APT package cache
 sudo apt autoclean
 
 echo "Installation complete. System will shut down."
@@ -402,3 +538,4 @@ echo "Installation complete. System will shut down."
 sudo shutdown -h +1
 sleep 8
 sudo rm -- "$0"
+
