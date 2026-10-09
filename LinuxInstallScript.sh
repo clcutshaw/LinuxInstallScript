@@ -109,8 +109,9 @@ get_installed_version () {
 }
 
 
+
 # =========================
-# Default Applications (APT/Nala)
+# Default Applications (APT)
 # =========================
 
 install_default_apps () {
@@ -119,15 +120,9 @@ install_default_apps () {
     echo " Installing Default Applications"
     echo "========================================"
 
-    # Install Nala if it is missing
-	if ! command -v nala >/dev/null 2>&1; then
-    	sudo apt update || return 1
-    	sudo apt install -y nala || return 1
-	fi
-
-	# Update and upgrade using Nala
-	sudo nala update || return 1
-	sudo nala upgrade -y || return 1
+    # Update package lists and upgrade system
+    sudo apt update || return 1
+    sudo apt upgrade -y || return 1
 
     # Default Debian applications
     local APPS=(
@@ -149,19 +144,18 @@ install_default_apps () {
         gparted
         curl
         kitty
-		okular
+        okular
     )
 
     echo "Installing default applications..."
 
-    if sudo nala install -y "${APPS[@]}"; then
+    if sudo apt install -y "${APPS[@]}"; then
         echo "Default application installation complete."
     else
         echo "ERROR: Default application installation failed."
         return 1
     fi
 }
-
 
 # =========================
 # Snap Applications
