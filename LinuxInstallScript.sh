@@ -146,6 +146,7 @@ install_default_apps () {
         curl
         kitty
         okular
+		f3d
     )
 
     echo "Installing default applications..."
@@ -250,6 +251,8 @@ install_flatpak () {
     "com.bambulab.BambuStudio"
     "com.discordapp.Discord"
     "com.bitwarden.desktop"
+	"org.speedcrunch.SpeedCrunch"
+
 )
 
     local APP
